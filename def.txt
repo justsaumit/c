@@ -1,0 +1,63 @@
+Program for IPC using Message queues are almost similar to named pipes 
+with the exception that they do not require the opening and closing of pipes. 
+But, they face one similar problem like named pipes; blocking on full pipes. 
+Message queues send blocks of data from one process to another. 
+Each block of data is considered to have a type. 
+There is an upper limit on the maximum size of each block and also a limit on the maximum total size of all blocks on all queues in the system.
+
+
+Message Queue Functions
+There are 4 important functions that we will use in the programs to achieve IPC using message queues
+
+int msgget(key_t key, int msgflg);
+int msgsnd(int msqid, const void *msg_ptr, size_t msg_sz, int msgflg);
+int msgrcv(int msqid, void *msg_ptr, size_t msg_sz, long int msgtype, int msgflg);
+int msgctl(int msqid, int command, struct msqid_ds *buf);
+Now let’s understand each of these functions in detail.
+
+```
+int msgget(key_t key, int msgflg);
+```
+
+To create and access a message queue, we use the msgget function. It takes two parameters. The first parameter is a key that names a message queue in the system. The second parameter is used to assign permission to the message queue and is ORed with IPC_CREAT to create the queue if it doesn’t already exist. if the queue already exists then IPC_CREAT is ignored. On success, the msgget function returns a positive number which is the queue identifier while on failure it returns -1.
+
+The second functions is msgsnd
+
+```
+int msgsnd(int msqid, const void *msg_ptr, size_t msg_sz, int msgflg);
+```
+
+This function allows us to add a message to the message queue. The first parameter (msgid) is the message queue identifier returned by the msgget function. The second parameter, is the pointer to the message to be sent, which must start with a long int type. The third parameter, is the size of the message. It must not include the long int message type. The fourth and final parameter controls what happens if either the message queue is full or the system limit on queued messages is reached. The function on success returns 0 and place the copy of message data on the message queue. On failure it returns -1.
+
+There are two constraints related to the structure of the message. First, it must be smaller than the system limit and,
+second, it must start with a long int. This long int is used as a message type in the receive function. The best structure of the message is:
+struct my_message {
+long int message_type;
+/* The data you wish to transfer */
+}
+Since the message_type is used in message reception, you can’t simply ignore it. Not only must you declare
+your data structure to include it, it’s also wise to initialize it, so that it contains a known value.
+
+The third function is msgrcv
+
+```
+int msgrcv(int msqid, void *msg_ptr, size_t msg_sz, long int msgtype, int msgflg);
+```
+
+This function retrieves messages from a message queue. The first parameter (msgid) is the message queue identifier returned by the msgget function. The second parameter, is the pointer to the message to be received, which must start with a long int type as explained above. The third parameter is the size of the message.
+
+The fourth parameter allows implementing priority. If the value is 0, the first available message in the queue is retrieved. But if the value is greater than 0 then the first message with the same message type is retrieved. If the value is less than 0 then the first message having the type value same as the absolute value of msgtype is retrieved. In simple words 0 value means to receive the messages in the order in which they were sent and non zero means receive the message with a specific message type. The final parameter controls what happens if either the message queue is full or the system limit on queued messages is reached. The function on success returns 0 and place the copy of message data on the message queue. On failure it returns -1.
+
+The final function is msgctl, which is the control function.
+
+```
+int msgctl(int msqid, int command, struct msqid_ds *buf);
+```
+
+The first parameter is the identifier returned by msgget function. The second parameter can have one out of the below three values
+
+Command	Description
+IPC_STAT	Sets the data in the msqid_ds structure to reflect the values associated with the message queue.
+IPC_SET	If the process has permission to do so, this sets the values associated with the message queue to those provided in the msqid_ds data structure.
+IPC_RMID	Deletes the message queue.
+The msgctl function returns 0 on success and -1 on error. The send or receive function will fail if a message queue is deleted while a process is waiting in a msgsnd or msgrcv function.
