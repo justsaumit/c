@@ -17,7 +17,7 @@
          int msgid;
          struct my_msg some_data;
          long int msg_to_rec=0;
-         msgid=msgget((key_t)14534,0666|IPC_CREAT);
+         msgid=msgget((key_t)12345,0666|IPC_CREAT);
          while(running)
          {
                  msgrcv(msgid,(void *)&some_data,BUFSIZ,msg_to_rec,0);                 
