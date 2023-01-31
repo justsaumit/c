@@ -21,6 +21,9 @@
          while(running)
          {
                  msgrcv(msgid,(void *)&some_data,BUFSIZ,msg_to_rec,0);                 
+            // messgae recieve function accepts 5 parameters 1 message id - message queue identifier
+            // pointer to the message to be recieved, size of the messsage, 
+            // 0 same
                  printf("Data received: %s\n",some_data.some_text);
                  if(strncmp(some_data.some_text,"end",3)==0)
                  {
