@@ -1,2 +1,0 @@
-How it works?
-The msg_to_rec variable is set to 0 so that the data is received in the same order as sent (refer the theory above for more details). The while is used to continuous receive the data using the mgrcv() function until the text received is “end”, which we check using the strcmp function. The data is read using the structure my_msg.
