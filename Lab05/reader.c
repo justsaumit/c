@@ -21,7 +21,7 @@ int main() {
     }
 
     // attach the shared memory segment to the reader's address space
-    shm = (char *) shmat(shmid, NULL, 0);
+    shm = shmat(shmid, NULL, 0);
     if (shm == (char *) -1) {
         perror("Error attaching shared memory segment");
         exit(1);
