@@ -12,10 +12,22 @@ int main()
     char buffer[BUF_SIZE];
     pid_t pid;
 
-    pipe(fd1); // 1st pipe is created
-    pipe(fd2); // 2nd pipe is created
+    if (pipe(fd1) == -1){ // 1st pipe is created
+        perror("pipe1");
+        exit(1);
+    }
+
+    if (pipe(fd2) == -1){ // 2nd pipe is created
+        perror("pipe2");
+        exit(1);
+    }
 
     pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        exit(1);
+    }
+
     if (pid == 0) {     // child process
         close(fd1[1]);  // close unused write end of the pipe1
         close(fd2[0]);  // close unused read end of the pipe2
@@ -38,4 +50,5 @@ int main()
         close(fd1[1]);
         close(fd2[0]);
     }
+    return 0;
 }
